@@ -30,8 +30,7 @@ const App = () => {
   };
 
   useEffect(()=> {
-    if(coin && currency) {
-      setAmount('');
+    if(coin && currency) {   
       APIREQUEST.get(`/${coin}/${currency}`).then(response => {
         setAmount((response?.data?.rate) * value);
         setCoinName(coin);
