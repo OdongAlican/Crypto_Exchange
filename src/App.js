@@ -8,6 +8,8 @@ const App = () => {
   const [value, setSetValue] = useState(1);
   const [currentCoin, setCurrentCoin] = useState('');
   const [currentCurrency, setCurrentCurrency] = useState('');
+  const [loading, setLoading]  = useState(false);
+  const [error, setError] = useState(null);
   const [amount, setAmount] = useState('');
   const API = '95CF4C23-5C1F-467A-910C-F6F9DBCEBC79';
   // const API = "9B4DA46A-CA8D-4D85-924D-7F2FF3F413C7";
@@ -31,12 +33,17 @@ const App = () => {
 
   useEffect(()=> {
     if(coin && currency) {   
+      setLoading(true);
       APIREQUEST.get(`/${coin}/${currency}`).then(response => {
+        setLoading(false);
         setAmount((response?.data?.rate) * value);
         setCoinName(coin);
         setCurrencyName(currency);
       }
-        ).catch(error => console.log(error));
+        ).catch(error => {
+          setLoading(false);
+          setError(error?.message);
+        });
     }
   }, [coin,currency, value]);
  
@@ -70,9 +77,9 @@ const App = () => {
           </select>
         </div>
             {
-              !amount ? (
+              loading ? (
                 <div className="information-section">Loading !!!</div>
-              ) : (
+              ) : error ? ( <div>{error}</div>) : (
                 <div className="information-section">
                   <div>{value} {currentCoin}</div>
                   <div> = </div>
