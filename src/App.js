@@ -10,7 +10,7 @@ const App = () => {
   const [currentCurrency, setCurrentCurrency] = useState('');
   const [amount, setAmount] = useState('');
   const API = '95CF4C23-5C1F-467A-910C-F6F9DBCEBC79';
-  // const API2 = "9B4DA46A-CA8D-4D85-924D-7F2FF3F413C7";
+  // const API = "9B4DA46A-CA8D-4D85-924D-7F2FF3F413C7";
 
   const APIREQUEST = axios.create({
     baseURL: 'https://rest.coinapi.io/v1/exchangerate',
