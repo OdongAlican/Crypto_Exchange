@@ -12,7 +12,7 @@ const App = () => {
   const [price, setPrice] = useState(0);
   const [modal, setModal] = useState(false);
 
-  const SERVICEREQUEST = axios.create({baseURL: 'http://localhost:3000/'});
+  const SERVICEREQUEST = axios.create({baseURL: 'https://thawing-gorge-77198.herokuapp.com/'});
 
   const selectCoin = (coinDetails) => {
     if(coin === 'DGD') { setSelectedCoin(coinDetails?.DGD) }
