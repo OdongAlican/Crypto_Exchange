@@ -9,10 +9,15 @@
 .input-sections {
   background-color: #fff;
   padding: 10px;
+  position: relative;
 }
 
 .input-sections-lower {
   display: flex;
+}
+
+i {
+  cursor: pointer;
 }
 
 input,
@@ -45,4 +50,12 @@ select {
 
 .information-section div {
   margin-left: 20px;
+}
+
+.display-rates {
+  position: absolute;
+  top: -100px;
+  right: 0;
+  padding: 20px;
+  background-color: #fff;
 }

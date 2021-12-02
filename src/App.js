@@ -3,72 +3,66 @@ import axios from 'axios';
 import './App.css';
 
 const App = () => {
-  const [coin, setCoin] = useState('BTC');
-  const [currency, setCurrency] = useState('USD');
-  const [value, setSetValue] = useState(1);
-  const [currentCoin, setCurrentCoin] = useState('');
-  const [currentCurrency, setCurrentCurrency] = useState('');
   const [loading, setLoading]  = useState(false);
   const [error, setError] = useState(null);
-  const [amount, setAmount] = useState('');
-  const API = '95CF4C23-5C1F-467A-910C-F6F9DBCEBC79';
-  // const API = "9B4DA46A-CA8D-4D85-924D-7F2FF3F413C7";
+  const [value, setValue] = useState(1);
+  const [coin, setCoin] = useState('BTC');
+  const [currency, setCurrency] = useState('USD');
+  const [selectedCoin, setSelectedCoin] = useState({});
+  const [price, setPrice] = useState(0);
+  const [modal, setModal] = useState(false);
 
-  const APIREQUEST = axios.create({
-    baseURL: 'https://rest.coinapi.io/v1/exchangerate',
-    headers: { 'X-CoinAPI-Key': API,}
-  });
+  const SERVICEREQUEST = axios.create({baseURL: 'http://localhost:3000/'});
 
-  const setCoinName = coin => {
-    if(coin === 'BTC') {setCurrentCoin('Bitcoin (BTC)')}
-    if (coin === 'DGD') { setCurrentCoin('Dodge Coin (DGD)')} 
-    if (coin === 'ETH') {setCurrentCoin('Etherium (ETH)')}
-  };
+  const selectCoin = (coinDetails) => {
+    if(coin === 'DGD') { setSelectedCoin(coinDetails?.DGD) }
+    if(coin === 'BTC') { setSelectedCoin(coinDetails?.BTC) }
+    if(coin === 'ETH') { setSelectedCoin(coinDetails?.ETH) }
+  }
 
-  const setCurrencyName = currency => {
-    if(currency === 'USD') {setCurrentCurrency('United Sates Dollars "$" (USD)')}
-    if (currency === 'GBP') { setCurrentCurrency('Great British Pound "£" (GBP)')} 
-    if (currency === 'EUR') {setCurrentCurrency('Euros "€" (EUR)')}
-  };
+  useEffect(( )=>{ 
+    if(currency === 'USD') return setPrice(parseFloat((selectedCoin?.quote?.USD?.price) * value).toFixed(2));
+    if(currency === 'EUR') return setPrice(parseFloat((selectedCoin?.quote?.USD?.price) * 0.88 * value).toFixed(2));
+    if(currency === 'GBP') return setPrice(parseFloat((selectedCoin?.quote?.USD?.price) * 0.75 * value).toFixed(2));
+  },[selectedCoin]);
 
-  useEffect(()=> {
-    if(coin && currency) {   
-      setLoading(true);
-      APIREQUEST.get(`/${coin}/${currency}`).then(response => {
-        setLoading(false);
-        setAmount((response?.data?.rate) * value);
-        setCoinName(coin);
-        setCurrencyName(currency);
-      }
-        ).catch(error => {
-          setLoading(false);
-          setError(error?.message);
-        });
-    }
-  }, [coin,currency, value]);
+  useEffect(()=>{ 
+    setLoading(true);
+    SERVICEREQUEST.get(`coin?coin=${coin}`).then(
+      response => { selectCoin(response?.data.data); setLoading(false);}
+    ).catch(error => {setError(error?.message); setLoading(false);});
+  },[value, coin, currency]);
  
   return (
     <div data-testid="appCoin" className="App">
       <div className="input-sections">
+      { modal &&
+        (<div className="display-rates">
+          <h5>Exchange Rates</h5>
+          <div className="rates-details">
+              1 USD = 0.88 EURO <br/>
+              1 USD = 0.75 GBP
+          </div>
+        </div>) }
         <div className="input-sections-top">
           <input aria-label="value-input" value={value} type="number" onChange={ e => {
             if(e.target.value < 0) 
             {
               alert('We cannot exchange for values less than 0!!')
-              return setSetValue(1);              
+              return setValue(1);              
             } 
-              setSetValue(e.target.value);
+              setValue(e.target.value);
             }
             }/>
         </div>
         <div className="input-sections-lower">
-          <select name="coin" value={coin} onChange={e => setCoin(e.target.value)}>
+        <select name="coin" value={coin} onChange={e => setCoin(e.target.value)}>
             <option value="BTC">Bitcoin (BTC)</option>
             <option value="DGD">Dodgecoin (DGD)</option>
             <option value="ETH">Etherium (ETH)</option>
           </select>
-          <div className="icon-section">
-          <i className="fas fa-exchange-alt" />
+          <div className="icon-section" onClick={() =>setModal(!modal)} >
+            <i className="fas fa-exchange-alt" />
           </div>
           <select name="currency" value={currency} onChange={e => setCurrency(e.target.value)}>
             <option value="USD">United States Dollar "$" (USD)</option>
@@ -81,9 +75,9 @@ const App = () => {
                 <div className="information-section">Loading !!!</div>
               ) : error ? ( <div>{error}</div>) : (
                 <div className="information-section">
-                  <div>{value} {currentCoin}</div>
+                  <div>{value} {coin}</div>
                   <div> = </div>
-                  <div>{ amount && parseFloat(amount).toFixed(2)} {currentCurrency}</div>
+                  <div>{ price && price} {currency}</div>
                 </div>
               )
             }
